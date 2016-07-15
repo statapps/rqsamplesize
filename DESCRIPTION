@@ -1,0 +1,10 @@
+Package: rqsamplesize
+Type: Package
+Title: Sample size estimation for quantile regression
+Version: 0.1
+Date: 2016-06-21
+Author: Zhenxian Gong, Bingshu Chen
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: Estimate sample size based on power analysis for quantile regression.
+License: What license is it under?
+LazyData: TRUE
