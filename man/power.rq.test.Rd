@@ -16,7 +16,7 @@
  }
     \arguments{
      \item{n}{Given sample size to compute power.}
-     \item{x}{A rqfun object.See "Details" and "Examples".}
+     \item{x}{A \code{\link{rqfun}} object.See "Details" and "Examples".}
      \item{sig.level}{Significance level of the test. The default is 0.05.}
      \item{power}{Power of the test between 0 and 1. It is required to compute sample size.}
      \item{tau}{The desired quantile between 0 and 1. The default is 0.5.}
@@ -28,7 +28,7 @@
      \item{alternative}{Choose either "one.sided" for one sided test or "two.sided" for two sided test.}
      }
  \details{
-A \code{\link{rqfun}} object needs to be defined in univariate regression situation. Here "univariate" means the independent variables are transformation of a single variable. It is defined as following: x = rqfun(mu=0, sd=1, dist='norm', term=c('1'), pos=2, method='exact', a =NA,  b=NA). It contains the information of the independent variable: "mu" is mean; "sd" is standard deviation; "dist" is the distribution which takes "norm" as normal and "unif" as uniform; "term" determines the number of transformation that is used eg. term=c("1","-1","log", "sqrt") indicates there are 4 variables: x,1/x,log(x) and sqrt(x); "pos" is the position of the regression coefficient(s) of interest (position of intercept is 1, but it is not important, so 1 is not recommended); "method" can be "exact" or "sim" which are the methods to compute variance of regression coefficients, "exact" method is recommended when variables are chosen from x,x^2,x^3,...,and x^5; "a" and "b" are optional but useful when dist="unif" is defined.
+A \code{\link{rqfun}} object needs to be defined in univariate regression situation. Here "univariate" means the independent variables are transformation of a single variable. It is defined as following: x = rqfun(mu=0, sd=1, dist='norm', term=c('1'), pos=2, method='exact', a =NA,  b=NA). It contains the information of the independent variable.
 
 It is assumed that error distribution is iid, so the calculation of variance of regression coefficients are based on Section 3.2.2 of Quantile Regression(2005).
  }
