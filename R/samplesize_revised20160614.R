@@ -11,14 +11,15 @@
 # Variance of the quanitle regression coefficient.
 ############################################################################################
 
-
+source("./library.R")
 
 ############################################################################################
 ## Sample size for quantile regression
 
-power.rq.test = function(n=NULL, x=NULL, sig.level=0.05,power=NULL, tau = 0.5,
-                         beta = 1, sd = 1, dist="Norm",kernel.smooth=NULL,bw=NULL,
-                         alternative = c("two.sided", "one.sided")){
+power.rq.test = function (x, n = NULL, sig.level = 0.05, power = NULL, 
+                                  tau = 0.5, beta = 1, sd = 1, dist = "Norm", kernel.smooth = NULL, 
+                                  bw = NULL, alternative = c("two.sided", "one.sided"))
+{
   #
   #x        is data in vector or matrix form
   #sig.level    is Type I error and power is Type II error
@@ -67,8 +68,9 @@ power.rq.test = function(n=NULL, x=NULL, sig.level=0.05,power=NULL, tau = 0.5,
 
   if(df > 1) {
     lambda = t(b)%*%solve(Vq)%*%b
+    c=df*(n-1)/(n-df-1)
     p.body = quote({
-      1-pf(qf(1-sig.level,df1 = df,df2 = n-p-1), ncp = n*lambda, df1=df,df2 = n-p-1)
+      1-c*pf(c*qf(1-sig.level,df1 = df,df2 = n-p-1), ncp = n*lambda, df1=df,df2 = n-p-1)
     })
     if(is.null(n)) {
       n = uniroot(function(n) eval(p.body) - power, c(1,1e+06))$root
