@@ -17,7 +17,7 @@ source("./library.R")
 ## Sample size for quantile regression
 
 power.rq.test = function (x, n = NULL, sig.level = 0.05, power = NULL, 
-                                  tau = 0.5, beta = 1, sd = 1, dist = "Norm", kernel.smooth = NULL, 
+                                  tau = 0.5, delta = 1, sd = 1, dist = "Norm", kernel.smooth = "norm", 
                                   bw = NULL, alternative = c("two.sided", "one.sided"))
 {
   #
@@ -40,7 +40,7 @@ power.rq.test = function (x, n = NULL, sig.level = 0.05, power = NULL,
     if (power<0||power>1)
       stop("Type II error is between 0 and 1.")
   }
-
+  beta = c(1, delta)
   alternative = match.arg(alternative)
   tside = switch(alternative, one.sided = 1, two.sided = 2)
 
@@ -49,38 +49,39 @@ power.rq.test = function (x, n = NULL, sig.level = 0.05, power = NULL,
   pos = x$pos
   b   = beta[pos]
   Vq  = qrV(x, sd, tau, dist,kernel.smooth,bw)[pos, pos]
+  p   = length(beta)
   df  = length(pos)
 
   if (df == 1) {
     if(is.null(n)) {
-        p.body = quote({
-          1-pt(qt(1-sig.level/tside,n-2), ncp = b/(sqrt(Vq/n)), df=n-2)
-        })
-        n = uniroot(function(n) eval(p.body) - power, c(3,1e+06))$root
-      }
-    } else if (is.null(power)) {
-      if (n-2==0)
-        stop("Sample size has to be greater than 2.")
-      else
-        power = 1-pt(qt(1-sig.level/tside,n-2), ncp = b/(sqrt(Vq/n)), df=n-2)
+      p.body = quote({
+        1-pt(qt(1-sig.level/tside,n-2), ncp = b/(sqrt(Vq/n)), df=n-2)
+      })
+      n = uniroot(function(n) eval(p.body) - power, c(3,1e+06))$root
+    # n=Vq*(qnorm(1-sig.level/tside)+qnorm(power))^2/(delta^2)
     }
-
-
+    if (is.null(power)) {
+      if (n-2 <= 0)
+        stop("Sample size has to be greater than 2.")
+      power = 1-pt(qt(1-sig.level/tside,n-2), ncp = b/(sqrt(Vq/n)), df=n-2)
+    }
+  }
   if(df > 1) {
     lambda = t(b)%*%solve(Vq)%*%b
-    c=df*(n-1)/(n-df-1)
     p.body = quote({
-      1-c*pf(c*qf(1-sig.level,df1 = df,df2 = n-p-1), ncp = n*lambda, df1=df,df2 = n-p-1)
+      c=p*(n-1)/(n-p)
+      #cat(c)
+      1-c*pf(c*qf(1-sig.level,df1 = df,df2 = n-p), ncp = n*lambda, df1=df,df2 = n-p)
     })
     if(is.null(n)) {
-      n = uniroot(function(n) eval(p.body) - power, c(1,1e+06))$root
+      n = uniroot(function(n) eval(p.body) - power, c(p+1,1e+06))$root
     } else if(is.null(power)) {
       power = eval(p.body)
     }
   }
   n = ceiling(n)
 
-  structure(list(n = n, beta = beta, pos = pos, sd = sd, sig.level = sig.level,
+  structure(list(n = n, delta = delta, pos = pos, sd = sd, sig.level = sig.level,
                  power = power, alternative = alternative, note = NOTE,
                  method = METHOD), class = "power.htest")
 }
@@ -92,9 +93,9 @@ power.rq.test = function (x, n = NULL, sig.level = 0.05, power = NULL,
 # Below are examples of using sample size for quantile regression, please do not delete
 #
 ##############################################################################################
-#beta = c(1, .23, -.015)
+#delta = c(.23, -.015)
 #x = rqfun(dist = "unif", pos = c(2, 3), term = c('2','3'),a= 3,b= 8, method = 'exact')
-#pw = power.rq.test(x=x, power = 0.8, beta=beta, sd = 2)
+#pw = power.rq.test(x=x, power = 0.8, delta=delta, sd = 2)
 #print(pw)
 #plot(x, beta = beta)
 

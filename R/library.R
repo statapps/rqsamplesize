@@ -3,7 +3,7 @@
 #
 #    x = rqfun(mu = 3, sd = 5)
 #
-
+source("./kerneldens.R")
 rqfun = function(x, ...) UseMethod("rqfun")
 
 ########################Initiate regression function#####################################
@@ -51,10 +51,16 @@ print.rqfun = function(x, ...) {
       cat('    sqrt(x)')
     if (x$term[i] == '2')
       cat('    x^2   ')
+    if (x$term[i] == '-2')
+      cat('    1/x^2   ')
     if (x$term[i] == '3')
       cat('    x^3   ')
+    if (x$term[i] == '-3')
+      cat('    1/x^3   ')
     if (x$term[i] == 'log')
       cat('    log(x) ')
+    if (x$term[i] == 'exp')
+      cat('    exp(x) ')
     for(j in 1:length(pos)) {
       if ((1+1) == pos[j]) cat('    *')
     }
@@ -112,31 +118,45 @@ getQs = function(x, B = 100000, X.return=FALSE) {
   x.lab[1] = 'Intercept'
   for (i in 1:x.dim) {
     j = i + 1
-    if (x$term[i] == '1') {
-      X[, j] = xi
-      x.lab[j] = 'x'
-    }
+    
     if (x$term[i] == '-2') {
       # how to handle xi = 0?
+      if (min(xi)==0)
+        stop("Error: 0 is in denominator.")
       X[, j] = 1/xi^2
       x.lab[j] = '1/x^2'
     }
     if (x$term[i] == '-1') {
       # how to handle xi = 0?
+      if (min(xi)==0)
+        stop("Error: 0 is in denominator.")
       X[, j] = 1/xi
       x.lab[j] = '1/x'
     }
     if (x$term[i] == '1/sqrt') {
       # how to handle xi = 0?
+      if (min(xi)==0)
+        stop("Error: 0 is in denominator.")
+      else if (min(xi)<0)
+        stop("Error: There is negative value in sqrt term.")
       X[, j] = 1/xi^0.5
       x.lab[j] = '1/sqrt(x)'
     }
-
+    if (x$term[i] == '-3') {
+      if (min(xi)==0)
+        stop("Error: 0 is in denominator.")
+      X[, j] = xi^(-3)
+      x.lab[j] = '1/x^3'
+    }
     if (x$term[i] == 'sqrt') {
       if (min(xi)<0)
         stop("Error: There is negative value in sqrt term.")
       X[, j] = xi^0.5
       x.lab[j] = 'sqrt(x)'
+    }
+    if (x$term[i] == '1') {
+      X[, j] = xi
+      x.lab[j] = 'x'
     }
     if (x$term[i] == '2') {
       X[, j] = xi^2
@@ -151,6 +171,8 @@ getQs = function(x, B = 100000, X.return=FALSE) {
       x.lab[j] = 'e^x'
     }
     if (x$term[i] == 'log') {
+      if (min(xi)<0)
+        stop("Error: There is negative value in sqrt term.")
       X[, j] = log(xi)
       x.lab[j] = 'log(x)'
     }
@@ -213,8 +235,8 @@ qrV=function(x, sd, tau, dist="Norm",kernel.smooth,bw,subint){
   #
   # x       Covariate
   # s       sd of error distribution
-  # dist    distribution of error: Norm, Cauchy or Gamma
-  # w       A vector of weights when d="Mix"
+  # dist    distribution of error: Norm, Cauchy, Gamma or a vector of residual
+
   x.dim = length(x$term)
 
   if(x.dim == 1)
