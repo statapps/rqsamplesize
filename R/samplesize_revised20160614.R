@@ -11,7 +11,7 @@
 # Variance of the quanitle regression coefficient.
 ############################################################################################
 
-source("./library.R")
+#source("./library.R")
 
 ############################################################################################
 ## Sample size for quantile regression
