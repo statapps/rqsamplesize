@@ -256,12 +256,14 @@ qrV=function(x, sd, tau, dist="Norm",kernel.smooth,bw,subint){
   if (is.null(dist)||dist=="Norm") {
     if (length(sd)>1)
       stop("Need a single number for standard deviation.")
-    df2 = dnorm(qnorm(tau,0,sd),0,sd)^2
+      mu=uniroot(function(m) pnorm(0,m,sd)-tau,c(-1e10,1e+10))$root  
+    df2 = dnorm(0,mu,sd)^2
   }
   else if (dist=="Cauchy") {
     if (length(sd)>1)
       stop("Need a single number for Cauchy scale parameter.")
-    df2 = dcauchy(qcauchy(tau,0,sd),0,sd)^2
+    loc=uniroot(function(l) pcauchy(0,l,sd)-tau,c(-1e10,1e+10))$root
+    df2 = dcauchy(0,loc,sd)^2
   }
   else if(dist=='Gamma') {
     # Error Ui has Gamma distribution with Gamma(k, 1/k), Var(Ui) = 1/k = s^2
