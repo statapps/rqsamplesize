@@ -3,7 +3,7 @@
 #
 #    x = rqfun(mu = 3, sd = 5)
 #
-#source("./kerneldens.R")
+source("./kerneldens.R")
 rqfun = function(x, ...) UseMethod("rqfun")
 
 ########################Initiate regression function#####################################
@@ -172,7 +172,7 @@ getQs = function(x, B = 100000, X.return=FALSE) {
     }
     if (x$term[i] == 'log') {
       if (min(xi)<0)
-        stop("Error: There is negative value in sqrt term.")
+        stop("Error: There is negative value in log term.")
       X[, j] = log(xi)
       x.lab[j] = 'log(x)'
     }
@@ -256,13 +256,13 @@ qrV=function(x, sd, tau, dist="Norm",kernel.smooth,bw,subint){
   if (is.null(dist)||dist=="Norm") {
     if (length(sd)>1)
       stop("Need a single number for standard deviation.")
-      mu=uniroot(function(m) pnorm(0,m,sd)-tau,c(-1e10,1e+10))$root  
+    mu=-qnorm(tau,0,sd)
     df2 = dnorm(0,mu,sd)^2
   }
   else if (dist=="Cauchy") {
     if (length(sd)>1)
       stop("Need a single number for Cauchy scale parameter.")
-    loc=uniroot(function(l) pcauchy(0,l,sd)-tau,c(-1e10,1e+10))$root
+    loc=-qcauchy(tau,0,sd)
     df2 = dcauchy(0,loc,sd)^2
   }
   else if(dist=='Gamma') {
