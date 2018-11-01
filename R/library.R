@@ -3,7 +3,7 @@
 #
 #    x = rqfun(mu = 3, sd = 5)
 #
-source("./kerneldens.R")
+# source("./kerneldens.R") # comment this out, otherwise, not able to install
 rqfun = function(x, ...) UseMethod("rqfun")
 
 ########################Initiate regression function#####################################
