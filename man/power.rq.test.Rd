@@ -16,7 +16,7 @@
 
  }
     \arguments{
-     \item{x}{A \code{\link{rqfun}} object.See "Details" and "Examples".}
+     \item{x}{A \code{\link{rqfun}} object.See "Details" and "Examples". It can also be a dataset if one is available.}
      \item{n}{Given sample size to compute power.}
      \item{sig.level}{Significance level of the test(Type I error probability). The default is 0.05.}
      \item{power}{Power of the test between 0 and 1(One minus Type II error probability). It is required to compute sample size.}
